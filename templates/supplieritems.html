@@ -1,0 +1,68 @@
+{% extends 'base_drafts_supplier_contracts.html' %}
+{% block content %}
+{% if user.is_authenticated %}
+<div class="sidenav bg-dark">
+<form class="fedora" method="post">{% csrf_token %}
+    {% if showall == 1%}
+        <input type="checkbox" id="show_pid"  name="showall" onChange="this.form.submit()" value="1" checked="checked"> <p>Show finished contracts</p>
+    {% else %}
+        <input type="checkbox" id="show_pid"  name="showall" onChange="this.form.submit()" value="0" > <p>Show finished contracts</p>
+    {% endif %}
+</form>
+{% for draft in drafts %}
+    <a class="a-gen" href="{% url 'drafts_detailed' pk=draft.id %}">{{ draft.title }}</a>
+{% endfor %}
+	</div>
+    <div class="info">
+        <div>
+            <div class="supplier">
+                {% for supplier in suppliers %}
+                    <p class="supplier">{{ supplier.name }}</p>
+                    <p class="supplier">{{ supplier.company_name }}</p>
+                    <p class="supplier">{{ supplier.email }}</p>
+                    <p class="supplier">{{ supplier.price }}$</p>
+                    <br>
+                {% endfor %}
+            </div>
+        </div>
+        <br>
+        <div>
+        <p>Make an offer!</p>
+        {% if suppliers|length > 1 %}
+        <form class="form-supplier" name="ourform" id="ourform" method='POST' action='/dashboard/drafts/{{ draft.id }}/item/{{ item }}/order/'>
+            {% csrf_token %}
+            <select id="select" name="select" onchange="setField()">
+                {% for supplier in suppliers %}
+                    <option value="{{ supplier.id }}">{{ supplier.name }}s</option>
+                    <br>
+                {% endfor %}
+            </select>
+            <input type="hidden" name="select" value="-400" id="hiddenselect">
+            <input type="number" name='price' value="1000">
+            <input type="submit" name='order' value="Order item">
+        </form>
+        {% else %}
+        <form class="form-supplier" name="ourform" id="ourform" method='POST' action='/dashboard/drafts/{{ draft.id }}/item/{{ item }}/order/{{ suppliers.0.id }}/supplier/'>
+            {% csrf_token %}
+            <select id="select" name="select" onchange="setField()">
+                {% for supplier in suppliers %}
+                    <option value="{{ supplier.id }}">{{ supplier.name }}s</option>
+                    <br>
+                {% endfor %}
+            </select>
+            <input type="hidden" name="select" value="{{ suppliers.0.id }}" id="hiddenselect">
+            <input type="number" name='price' value="1000">
+            <input type="submit" name='order' value="Order item">
+        </form>
+        {% endif %}
+        </div>
+    </div>
+    <script>
+       var d = document.ourform.action;
+</script>
+{% else %}
+  <p>You are not logged in</p>
+    <a href="{% url 'signup' %}">signup</a>
+    <a href="{% url 'login' %}">login</a>
+{% endif %}
+{% endblock %}

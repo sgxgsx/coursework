@@ -1,0 +1,55 @@
+{% extends 'base_drafts_supplier_contracts.html' %}
+{% block content %}
+{% if user.is_authenticated %}
+<div class="sidenav bg-dark">
+<form class="fedora" method="post">{% csrf_token %}
+    {% if showall == 1%}
+        <input type="checkbox" id="show_pid"  name="showall" onChange="this.form.submit()" value="1" checked="checked"> <p>Show finished contracts</p>
+    {% else %}
+        <input type="checkbox" id="show_pid"  name="showall" onChange="this.form.submit()" value="0" > <p>Show finished contracts</p>
+    {% endif %}
+</form>
+{% for contract in contracts %}
+    {% if showall == 1 %}
+        {% if contract.done == 0%}
+            <a class="a-gen" href="{% url 'contract_detailed' pk=contract.id %}">{{ contract.title }}</a>
+        {% else %}
+            <a class="a-gen" href="{% url 'contract_detailed' pk=contract.id %}">{{ contract.title }} Done!</a>
+        {% endif %}
+    {% else %}
+        {% if contract.taken == 0 %}
+            <a class="a-gen" href="{% url 'contract_detailed' pk=contract.id %}">{{ contract.title }}</a>
+        {% endif %}
+    {% endif %}
+{% endfor %}
+	</div>
+    <div class="info">
+        {% if contract %}
+        <h1>{{ contract.title }}</h1>
+        <p>{{ contract.content|linebreaks }}</p><br>
+        <p>{{ contract.needed|linebreaks }}</p>
+        <h5>Budget - {{ contract.budget }}$</h5><br>
+        {% if not contract.taken %}
+            <p>No one works with this contract</p>
+        {% else %}
+            <p> This contract is taken by {{ contract.userId }}</p>
+        {% endif %}
+        <form method='POST' action='/dashboard/contracts/{{ contract.id }}/draft'>
+            {% csrf_token %}
+            <input type="submit" name='prepair_comment' value="Make a Comment">
+        </form>
+        <br>
+        {% if not contract.done %}
+            <p>This contract wasn't finished!</p>
+        {% else %}
+            <p> This contract was finished by {{ contract.userId }}</p>
+        {% endif %}
+        {% endif %}
+    </div>
+
+{% else %}
+  <p>You are not logged in</p>
+    <a href="{% url 'signup' %}">signup</a>
+    <a href="{% url 'login' %}">login</a>
+{% endif %}
+{% endblock %}

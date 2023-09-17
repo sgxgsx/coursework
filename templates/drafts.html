@@ -1,0 +1,117 @@
+{% extends 'base_drafts_supplier_contracts.html' %}
+{% block content %}
+{% if user.is_authenticated %}
+
+<div class="sidenav bg-dark">
+<form class="fedora" method="post">{% csrf_token %}
+    {% if showall == 1%}
+        <input type="checkbox" id="show_pid"  name="showall" onChange="this.form.submit()" value="1" checked="checked"> <p>Show finished contracts</p>
+    {% else %}
+        <input type="checkbox" id="show_pid"  name="showall" onChange="this.form.submit()" value="0" > <p>Show finished contracts</p>
+    {% endif %}
+</form>
+{% for draft in drafts %}
+    {% if showall == 1 %}
+        {% if draft.done == 0 %}
+            <a class="a-gen" href="{% url 'drafts_detailed' pk=draft.id %}">{{ draft.title }}</a>
+        {% endif %}
+    {% else %}
+        <a class="a-gen" href="{% url 'drafts_detailed' pk=draft.id %}">{{ draft.title }}</a>
+    {% endif %}
+{% endfor %}
+    {% if update_form %}
+        <div class="info">
+            <form method='POST' action='/dashboard/drafts/{{ draft.id }}/update/'>
+                {% csrf_token %}
+                <textarea name="text" cols="70" rows="15">{{ draft.text }}</textarea>
+                <input type="submit" name='update' value="Save">
+            </form>
+        </div>
+    {% else %}
+	</div>
+    <div class="info">
+        {% if draft %}
+        <h1>{{ draft.title }}</h1>
+        {% if draft.done %}
+        <form class="check-proj" action="{% url 'drafts_restore' pk=draft.id %}" method="get">
+            <input type="submit" value="Restore" name="Submit" id="frm1_submit" />
+        </form>
+        <form class="check-proj" action="{% url 'drafts_report' pk=draft.id %}" method="get">
+            <input type="submit" value="Generate report" name="Submit" id="frm1_submit" />
+        </form>
+        {% else %}
+        <form class="check-proj" action="{% url 'drafts_finish' pk=draft.id %}" method="get">
+            <input type="submit" value="Finish" name="Submit" id="frm1_submit" />
+        </form>
+        <form class="check-proj" action="{% url 'drafts_update_view' pk=draft.id update=1 %}" method="get">
+            <input type="submit" value="update_it" name="Submit" id="frm1_submit" />
+        </form>
+        {% endif %}
+        <p>{{ draft.text|linebreaks }}</p><br>
+        {% if items %}
+            <form class="check-proj" action="{% url 'drafts_satisfy_all' pk=draft.id %}" method="get">
+                <input type="submit" value="Satisfy all possible" name="Submit" id="frm1_submit" />
+            </form>
+            {% if ipk %}
+                {% for item in items %}
+                    {% if ipk == item.draftid %}
+                        <div class="div-gen-item">
+                            {% if item_check %}
+                                <a class="a-gen-item" id="#{{ item.type }}" href="{% url 'drafts_item_check' pk=draft.id ipk=item.draftid %}">Item - {{ item.type }} is available</a>
+                                <form class="check-proj" action="{% url 'drafts_item_satisfy' pk=draft.id ipk=item.draftid %}" method="get">
+                                    <input type="submit" value="Satisfy" name="Submit" id="frm1_submit" />
+                                </form>
+                            {% else %}
+                                <a class="a-gen-item" id="#{{ item.type }}" href="#{{ item.type }}">Item - {{ item.type }} is not available in storage. Please order some</a>
+
+                                <form class="check-proj" action="{% url 'drafts_item_order' pk=draft.id ipk=item.draftid %}" method="get">
+                                    <input type="submit" value="Order" name="Submit" id="frm1_submit" />
+                                </form>
+                            {% endif %}
+                        </div>
+                    {% else %}
+                    {% if item.satisfied %}
+                        <div class="div-gen-item">
+                            <p class="p-gen-item">{{ item.type }} is satisfied.</p>
+                        </div>
+                    {% else %}
+                        <div class="div-gen-item">
+                            <a class="a-gen-item" id="#{{ item.type }}" href="{% url 'drafts_item_check' pk=draft.id ipk=item.draftid %}">Check {{ item.type }} and {{ item.draftid }}</a><br>
+                            <form class="check-proj" action="{% url 'drafts_item_check' pk=draft.id ipk=item.draftid %}" method="get">
+                                <input type="submit" value="Check" name="Submit" id="frm1_submit" />
+                            </form>
+                        </div>
+                    {% endif %}
+                    {% endif %}
+                {% endfor %}
+            {% else %}
+                {% for item in items %}
+                    {% if item.satisfied %}
+                        <div class="div-gen-item">
+                            <p class="p-gen-item">{{ item.type }} is satisfied.</p>
+                        </div>
+                    {% else %}
+                        <div class="div-gen-item">
+                            <a class="a-gen-item" id="#{{ item.type }}" href="{% url 'drafts_item_check' pk=draft.id ipk=item.draftid %}">Check {{ item.type }} and {{ item.draftid }}</a><br>
+                            <form class="check-proj" action="{% url 'drafts_item_check' pk=draft.id ipk=item.draftid %}" method="get">
+                                <input type="submit" value="Check" name="Submit" id="frm1_submit" />
+                            </form>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
+        {% endif %}
+        <form method='POST' action='/dashboard/drafts/{{ draft.id }}/delete'>
+            {% csrf_token %}
+            <input type="submit" name='delete' value="Delete draft">
+        </form>
+        {% endif %}
+    </div>
+    {% endif %}
+
+{% else %}
+  <p>You are not logged in</p>
+    <a href="{% url 'signup' %}">signup</a>
+    <a href="{% url 'login' %}">login</a>
+{% endif %}
+{% endblock %}

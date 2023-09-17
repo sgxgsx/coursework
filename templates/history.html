@@ -1,0 +1,26 @@
+{% extends 'base_management.html' %}
+{% block content %}
+{% if user.is_authenticated %}
+	</div>
+    <div class="info_stat">
+        <h1>History</h1>
+        <table class="table-fill-extend">
+        <tr>
+            <td>Time</td>
+            <td>Action</td>
+            </tr>
+        {% for d in data %}
+            <tr>
+            <td class="text-left">{{ d.time }}</td>
+            <td class="text-left">{{ d.message }}</td>
+            </tr>
+        {% endfor %}
+        </table>
+    </div>
+
+{% else %}
+  <p>You are not logged in</p>
+    <a href="{% url 'signup' %}">signup</a>
+    <a href="{% url 'login' %}">login</a>
+{% endif %}
+{% endblock %}

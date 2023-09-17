@@ -1,0 +1,45 @@
+{% extends 'base_management.html' %}
+{% block content %}
+{% if user.is_authenticated %}
+<div class="sidenav bg-dark">
+{% for contract in contracts %}
+    {% if contract.done == 0%}
+        <a class="a-gen" href="{% url 'm_contract_detailed' pk=contract.id %}">{{ contract.title }}</a>
+    {% else %}
+        <a class="a-gen" href="{% url 'm_contract_detailed' pk=contract.id %}">{{ contract.title }} Done!</a>
+    {% endif %}
+{% endfor %}
+	</div>
+    <div class="info"/>
+        {% if contract %}
+        <h1>{{ contract.title }}</h1>
+        {% if average %}
+            <p>Agent - <b>{{ average.0 }}</b>   -  average hours worked {{ average.1 }}</p><br>
+        {% endif %}
+        {% if sum_draft %}
+            <p><b>Contract costs</b> - {{ sum_draft.1 }}</p><br>
+        {% endif %}
+        <p>{{ contract.content|linebreaks }}</p><br>
+        <p>{{ contract.needed|linebreaks }}</p>
+
+        <h5>Budget - {{ contract.budget }}$</h5><br>
+        {% if not contract.taken %}
+            <p>No one works with this contract</p>
+        {% else %}
+            <p> This contract is taken by {{ contract.userId }}</p>
+        {% endif %}
+        <br>
+        {% if not contract.done %}
+            <p>This contract wasn't finished!</p>
+        {% else %}
+            <p> This contract was finished by {{ contract.userId }}</p>
+        {% endif %}
+        {% endif %}
+    </div>
+
+{% else %}
+  <p>You are not logged in</p>
+    <a href="{% url 'signup' %}">signup</a>
+    <a href="{% url 'login' %}">login</a>
+{% endif %}
+{% endblock %}

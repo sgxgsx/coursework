@@ -1,0 +1,113 @@
+{% extends 'base_management.html' %}
+{% block content %}
+{% if user.is_authenticated %}
+	</div>
+    <div class="info_stat">
+        <h1>Statistics</h1>
+        <div class="table-title">
+            <h3>Clients and their contracts</h3>
+        </div>
+        <table class="table-fill">
+        <tr>
+            <td>Client</td>
+            <td>Contract</td>
+            </tr>
+        {% for d in data %}
+            <tr>
+            <td class="text-left">{{ d.0 }}</td>
+            <td class="text-left">{{ d.1 }}</td>
+            </tr>
+        {% endfor %}
+        </table>
+        <form class="check-proj" action="{% url 'm_report' %}" method="get">
+            <input type="submit" value="Generate report" name="Submit" id="frm1_submit" />
+        </form>
+        <p> Fetch client emails or contracts with items like: </p>
+        <form class="form-supplier" name="ourform" id="ourform" method='POST' action='/management/stats/'>
+            {% csrf_token %}
+            <select id="select" name="select" onchange="setField()">
+                <option value="0">Fetch emails</option>
+                <option value="1">Fetch contracts with an item</option>
+            </select>
+            <input type="hidden" name="select" value="0" id="hiddenselect">
+            <input type="text"  name='text' value="">
+            <input type="submit" name='order' value="Fetch">
+        </form>
+
+
+        {% if numbertwo %}
+            <p>two</p>
+        {% for item in numbertwo %}
+            {% for u in item %}
+                <p class="spec-p">{{ u }}</p>
+                {% endfor %}
+        {% endfor %}
+        {% endif %}
+
+
+        <form class="form-supplier" name="ourform2" id="ourform2" method='POST' action='/management/stats/'>
+            {% csrf_token %}
+            <select id="select2" name="select2" onchange="setField2()">
+                <option value="0">Fetch emails</option>
+                <option value="1">Fetch contracts with an item</option>
+            </select>
+            <input type="hidden" name="select2" value="0" id="hiddenselect2">
+            <input type="date"  name='datef' value="">
+            <input type="date"  name='datel' value="">
+            <input type="submit" name='submit' value="Submit">
+        </form>
+
+        {% if between %}
+            <p class="spec-p">Between query</p><p class="spec-p">Hours worked</p><br>
+            {% for item in between %}
+                {% for u in item %}
+                    <p class="spec-p">{{ u }}</p>
+                {% endfor %}
+                <br>
+            {% endfor %}
+        {% endif %}
+
+        {% if avg_group_contract %}
+            <div class="table-title">
+                <h3>Clients payments for contracts</h3>
+            </div>
+            <table class="table-fill">
+                <tr>
+                    <td>Client</td>
+                    <td>Contract</td>
+                    <td>Price</td>
+                    </tr>
+                {% for d in avg_group_contract %}
+                    <tr>
+                    <td class="text-left">{{ d.0 }}</td>
+                    <td class="text-left">{{ d.1 }}</td>
+                    <td class="text-left">{% if d.2 %}{{ d.2 }}${% else %}0${% endif %}</td>
+                    </tr>
+                {% endfor %}
+            </table>
+        {% endif %}
+        {% if avg_group_user %}
+            <div class="table-title">
+                <h3>User average work hours</h3>
+            </div>
+            <table class="table-fill">
+                <tr>
+                    <td>User</td>
+                    <td>Hours</td>
+                    </tr>
+                {% for d in avg_group_user %}
+                    <tr>
+                    <td class="text-left">{{ d.0 }}</td>
+                    <td class="text-left">{{ d.1 }}</td>
+                    </tr>
+                {% endfor %}
+            </table>
+        {% endif %}
+    </div>
+
+{% else %}
+  <p>You are not logged in</p>
+    <a href="{% url 'signup' %}">signup</a>
+    <a href="{% url 'login' %}">login</a>
+{% endif %}
+{% endblock %}

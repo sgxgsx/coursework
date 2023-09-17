@@ -1,0 +1,31 @@
+{% extends 'base_drafts_supplier_contracts.html' %}
+{% block content %}
+{% if user.is_authenticated %}
+<div class="sidenav bg-dark">
+{% for supplier in suppliers %}
+    <a class="a-gen" href="{% url 'suppliers_detailed' pk=supplier.id %}">{{ supplier.name }}</a>
+{% endfor %}
+	</div>
+    <div class="info">
+        {% if supplier %}
+        <h1>{{ supplier.name }}</h1>
+        <br>
+        <h5>Company name: {{ supplier.company_name }}</h5>
+        <div class="contacts">
+            <h4>Contacts</h4>
+            <p>Email: {{ supplier.email }}<br>Phone number: {{ supplier.phone }}</p>
+        </div>
+            {% for item in supplier_items %}
+                <h4>{{ item.type }}</h4>
+                <p>{{ item.description }}</p>
+                <p>{{ item.quantity }}</p>
+            {% endfor %}
+        {% endif %}
+    </div>
+
+{% else %}
+  <p>You are not logged in</p>
+    <a href="{% url 'signup' %}">signup</a>
+    <a href="{% url 'login' %}">login</a>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,51 @@
+{% extends 'base_management.html' %}
+{% block content %}
+{% if user.is_authenticated %}
+
+<div class="sidenav bg-dark">
+{% for draft in drafts %}
+    {% if draft.done == 1 %}
+        <a class="a-gen" href="{% url 'm_draft_detailed' pk=draft.id %}">{{ draft.title }} Finished</a>
+    {% else %}
+        <a class="a-gen" href="{% url 'm_draft_detailed' pk=draft.id %}">{{ draft.title }}</a>
+    {% endif %}
+{% endfor %}
+	</div>
+    <div class="info">
+        {% if draft %}
+        <h1>{{ draft.title }}</h1>
+        {% if draft.done %}
+        <form class="check-proj" action="{% url 'm_drafts_restore' pk=draft.id %}" method="get">
+            <input type="submit" value="Restore" name="Submit" id="frm1_submit" />
+        </form>
+        <form class="check-proj" action="{% url 'm_drafts_report' pk=draft.id %}" method="get">
+            <input type="submit" value="Generate report" name="Submit" id="frm1_submit" />
+        </form>
+        {% else %}
+        <form class="check-proj" action="{% url 'm_drafts_finish' pk=draft.id %}" method="get">
+            <input type="submit" value="Finish" name="Submit" id="frm1_submit" />
+        </form>
+        {% endif %}
+        <p>{{ draft.text|linebreaks }}</p><br>
+        {% if items %}
+            {% for item in items %}
+                {% if item.satisfied %}
+                    <div class="div-gen-item">
+                        <p class="p-gen-item">{{ item.type }} is satisfied.</p>
+                    </div>
+                {% else %}
+                    <div class="div-gen-item">
+                        <p class="p-gen-item">{{ item.type }} is NOT satisfied.</p>
+                    </div>
+                {% endif %}
+            {% endfor %}
+        {% endif %}
+        {% endif %}
+    </div>
+
+{% else %}
+  <p>You are not logged in</p>
+    <a href="{% url 'signup' %}">signup</a>
+    <a href="{% url 'login' %}">login</a>
+{% endif %}
+{% endblock %}
